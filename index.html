@@ -31,7 +31,8 @@ body{font-family:var(--font);color:var(--ink);background:linear-gradient(180deg,
 .lab i{font-style:normal;flex:none;width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;font-size:13px;display:grid;place-items:center}
 select,input[type=search]{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:2px solid var(--mint-d);border-radius:14px;padding:12px 14px;min-height:48px;appearance:none;-webkit-appearance:none}
 select{background-image:linear-gradient(45deg,transparent 50%,var(--teal-d) 50%),linear-gradient(135deg,var(--teal-d) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:38px}
-select:focus,input:focus,button:focus-visible,summary:focus-visible{outline:3px solid rgba(73,176,168,.45);outline-offset:2px}
+select:focus,input:focus{outline:0;border-color:var(--pink);box-shadow:0 0 0 4px rgba(231,104,116,.22)}
+button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid rgba(231,104,116,.5);outline-offset:2px}
 input[type=search]{margin-bottom:8px;min-height:44px;font-size:15px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .chip{font:inherit;font-size:14px;border:2px solid var(--mint-d);background:#fff;color:var(--teal-d);border-radius:999px;padding:6px 14px;min-height:40px;cursor:pointer}
@@ -534,7 +535,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     if (!weeks.length) { ["s2", "s3", "s4"].forEach(function (i) { $id(i).hidden = true; }); return; }
     reveal("s2");
     fill($id("weeks"), weeks.map(function (w) { return { id: w, name: w + "週間" }; }), sel.weeks);
-    var pop = [1, 2, 4, 8, 12, 16, 24].filter(function (w) { return weeks.indexOf(w) >= 0; });
+    var pop = [1, 2, 3, 4, 8, 12, 16, 24].filter(function (w) { return weeks.indexOf(w) >= 0; });
     $id("chips").innerHTML = pop.map(function (w) { return '<button type="button" class="chip" data-w="' + w + '" aria-pressed="' + (w === sel.weeks) + '">' + w + "週</button>"; }).join("");
     var courses = C.getOptions(ENV, { key: sel.key, campusId: sel.campusId, weeks: sel.weeks }, today).courses;
     reveal("s3"); fill($id("course"), courses, sel.courseId);
