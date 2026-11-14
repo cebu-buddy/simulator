@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>留学費用シミュレーター｜セブ島留学バディー</title>
-<meta name="description" content="学校・期間・コース・部屋タイプを選ぶだけで、セブ島留学の費用の目安がすぐ分かります。ウェブ限定5%OFFつき。">
+<meta name="description" content="学校・期間・コース・部屋タイプを選ぶだけで、セブ島留学の費用の目安がすぐ分かります。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
@@ -423,7 +423,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     <div class="sun" aria-hidden="true"></div>
     <div>
       <h1>留学費用シミュレーター</h1>
-      <p>選ぶだけで、費用の目安がすぐ分かります。ウェブ限定の5%OFFつき。</p>
+      <p>選ぶだけで、費用の目安がすぐ分かります。</p>
     </div>
   </header>
 
@@ -574,7 +574,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     else if (qt.localRows.length) local = '<details><summary>現地でのお支払い（約 ' + yen(qt.localYen) + '）</summary><ul class="rows">' + qt.localRows.map(function (r) { return "<li><span>" + esc(r.label) + (r.note ? '<span class="sub">' + esc(r.note) + "</span>" : "") + '</span><span class="v">₱' + Math.round(r.php).toLocaleString("en-US") + "</span></li>"; }).join("") + '<li><span><b>合計</b><span class="sub">1ペソ＝' + qt.phpRate + "円の参考換算</span></span><span class=\"v\">₱" + Math.round(qt.localPhp).toLocaleString("en-US") + "</span></li></ul></details>";
     var saved = -qt.discount5Yen;
     el.innerHTML =
-      '<div class="total"><small>費用の目安（ウェブ限定5%OFF適用後）</small><div class="num" id="totalNum">' + yen(shown) + '</div><span class="off">' + yen(saved) + " おトク</span></div>" +
+      '<div class="total"><small>費用の目安</small><div class="num" id="totalNum">' + yen(shown) + '</div><span class="off">' + yen(saved) + " おトク</span></div>" +
       rateTxt + '<ul class="rows">' + rows + "</ul>" +
       '<div class="web5"><b>ウェブ限定5%OFF</b>は、上の金額にすでに反映されています。</div>' + local +
       '<ul class="notes">' +
