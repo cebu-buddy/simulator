@@ -650,7 +650,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     }).join("");
     if (WEB) rows += '<li class="neg"><span>ウェブ限定5%OFF<span class="sub">授業料および寮費（長期割引後）の5%</span></span><span class="v">' + yen(qt.discount5Yen) + "</span></li>";
     if (qt.adjustYen) rows += '<li class="neg"><span>端数調整<span class="sub">千円未満を調整</span></span><span class="v">' + yen(qt.adjustYen) + "</span></li>";
-    rows += '<li class="free"><span>留学サポート費用<span class="sub">留学プログラムのサポート</span></span><span class="v">無料</span></li>';
+    rows += '<li class="free"><span>留学サポート費用</span><span class="v">無料</span></li>';
     var rateTxt = qt.rate ? '<p class="rate">※' + (mode === "fixed" ? "固定レート" : esc(rate.info)) + "：1ドル＝" + qt.rate + "円で計算</p>" : "";
     var local = "";
     if (qt.localInYen) local = "";
