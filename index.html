@@ -61,7 +61,7 @@ details .rows{margin-top:0;padding-bottom:6px}
 .notes li:before{content:"※ "}
 .actions{display:grid;gap:10px;margin-top:16px}
 .btn{display:block;text-align:center;text-decoration:none;font:inherit;font-weight:700;border:0;border-radius:999px;padding:14px 16px;min-height:50px;cursor:pointer}
-.btn.line{background:var(--pink);color:#fff;box-shadow:0 6px 14px rgba(231,104,116,.3)}
+.btn.line{background:#06C755;color:#fff;box-shadow:0 6px 14px rgba(6,199,85,.3)}
 .btn.line:active{transform:translateY(1px)}
 .btn.ghost{background:#fff;color:var(--teal-d);border:2px solid var(--mint-d)}
 .msg{margin-top:16px;padding:16px;border-radius:16px;background:var(--mint);font-size:15px}
@@ -270,6 +270,7 @@ function suggestPeakWeeks(S, entryStr, weeks){ return suggestWeeksIn(S, S.peakPe
 
 const SimCore = (() => {
   const DISCOUNT_RATE = 0.05;
+  const ROUND_UNIT = 1000;
   const PHP_YEN = 2.6;
 
   const EXCLUDE_KEYS = ["SMEAG_ENCANTO_FAM", "SMEAG_ENCANTO_HAPPY", "EVLM_FAMILY", "BRILLIANT_FAM", "PILA_FAM_NP", "PILA_FAM_PK"];
@@ -358,7 +359,7 @@ const SimCore = (() => {
   const LABEL = { enroll: "入学金", tuition: "授業料および寮費", longdisc: "長期割引" };
 
   function quote(env, sel, rate, today) {
-    const bad = reason => ({ ok: false, reason, lines: [], tuitionYen: 0, longDiscountYen: 0, discount5Yen: 0, totalYen: 0, localRows: [], localPhp: 0, localYen: 0 });
+    const bad = reason => ({ ok: false, reason, lines: [], adjustYen: 0, tuitionYen: 0, longDiscountYen: 0, discount5Yen: 0, totalYen: 0, localRows: [], localPhp: 0, localYen: 0 });
     const e = eff(env, sel.key, today);
     if (e._noTable) return bad("noTable");
     const mode = needsRate(env, sel.key, today);
@@ -385,9 +386,12 @@ const SimCore = (() => {
       });
       const discount5Yen = -Math.round((tuitionYen + longDiscountYen) * DISCOUNT_RATE);
       const itemsSum = q.items.reduce((a, i) => a + i.yen, 0);
+
+      const before = itemsSum + discount5Yen, adjustYen = before > 0 ? -(before % ROUND_UNIT) : 0;
+      if (adjustYen) lines.push({ id: "round", label: "端数調整", yen: adjustYen, note: "" });
       const localPhp = loc.rows.reduce((a, x) => a + x[2], 0);
       return {
-        ok: true, lines, tuitionYen, longDiscountYen, discount5Yen, totalYen: itemsSum + discount5Yen, rate: mode === "none" ? null : r,
+        ok: true, lines, tuitionYen, longDiscountYen, discount5Yen, totalYen: before + adjustYen, adjustYen, rate: mode === "none" ? null : r,
         localRows: loc.rows.map(x => ({ label: x[0], php: x[2], note: x[3] })), localPhp, localYen: Math.round(localPhp * phpRate),
         localInYen: !!e.localJPY, localPending, localUnknown: !!e.localUnknown, localIncluded: !!e.localIncluded, phpRate
       };
@@ -560,18 +564,19 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     }
     var qt = C.quote(ENV, sel, rate.value, today);
     if (!qt.ok) { el.innerHTML = '<div class="msg"><p>この条件の金額は、ここでは出せませんでした。LINEで、ご案内しますね。</p>' + lineBtn("公式LINEで問い合わせる") + "</div>"; shown = 0; return; }
-    var rows = qt.lines.map(function (l) {
+    var rows = qt.lines.filter(function (l) { return l.id !== "round"; }).map(function (l) {
       var neg = l.yen < 0;
       return '<li class="' + (neg ? "neg" : "") + '"><span>' + esc(l.label) + (l.note ? '<span class="sub">' + esc(l.note) + "</span>" : "") + '</span><span class="v">' + yen(l.yen) + "</span></li>";
     }).join("");
     rows += '<li class="neg"><span>ウェブ限定5%OFF<span class="sub">授業料および寮費（長期割引後）の5%</span></span><span class="v">' + yen(qt.discount5Yen) + "</span></li>";
+    if (qt.adjustYen) rows += '<li class="neg"><span>端数調整<span class="sub">千円未満を調整して、きりのよい金額にしています</span></span><span class="v">' + yen(qt.adjustYen) + "</span></li>";
     rows += '<li class="free"><span>サポート費用<span class="sub">留学プログラムのサポート</span></span><span class="v">無料</span></li>';
     var rateTxt = qt.rate ? '<p class="rate">' + (mode === "fixed" ? "固定レート" : esc(rate.info)) + "：1ドル＝" + qt.rate + "円で計算しています。</p>" : "";
     var local = "";
     if (qt.localInYen) local = "";
     else if (qt.localIncluded) local = '<details><summary>現地でのお支払い</summary><ul class="rows"><li><span>SSP・ビザ・電気水道代など</span><span class="v">料金に含まれます</span></li></ul></details>';
     else if (qt.localPending || qt.localUnknown) local = '<details><summary>現地でのお支払い</summary><ul class="rows"><li><span>金額は、LINEでご案内します</span><span class="v">−</span></li></ul></details>';
-    else if (qt.localRows.length) local = '<details><summary>現地でのお支払い（約 ' + yen(qt.localYen) + '）</summary><ul class="rows">' + qt.localRows.map(function (r) { return "<li><span>" + esc(r.label) + (r.note ? '<span class="sub">' + esc(r.note) + "</span>" : "") + '</span><span class="v">₱' + Math.round(r.php).toLocaleString("en-US") + "</span></li>"; }).join("") + '<li><span><b>合計</b><span class="sub">1ペソ＝' + qt.phpRate + "円の参考換算</span></span><span class=\"v\">₱" + Math.round(qt.localPhp).toLocaleString("en-US") + "</span></li></ul></details>";
+    else if (qt.localRows.length) local = '<details><summary>現地でのお支払い（₱' + Math.round(qt.localPhp).toLocaleString("en-US") + ' ≒ ' + yen(qt.localYen) + '）</summary><ul class="rows">' + qt.localRows.map(function (r) { return "<li><span>" + esc(r.label) + (r.note ? '<span class="sub">' + esc(r.note) + "</span>" : "") + '</span><span class="v">₱' + Math.round(r.php).toLocaleString("en-US") + "</span></li>"; }).join("") + '<li><span><b>合計</b><span class="sub">1ペソ＝' + qt.phpRate + "円の参考換算</span></span><span class=\"v\">₱" + Math.round(qt.localPhp).toLocaleString("en-US") + "</span></li></ul></details>";
     var saved = -qt.discount5Yen;
     el.innerHTML =
       '<div class="total"><small>費用の目安</small><div class="num" id="totalNum">' + yen(shown) + '</div><span class="off">' + yen(saved) + " おトク</span></div>" +
