@@ -56,6 +56,16 @@ input[type=search]{margin-bottom:8px;min-height:44px;font-size:15px}
 .web5{margin-top:12px;background:#FFF3F4;border:1px solid #F7CBD0;border-radius:14px;padding:10px 12px;font-size:14px}
 .web5 b{color:var(--pink)}
 details{container-type:inline-size;margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:0 12px}
+.slink{display:flex;align-items:center;gap:12px;margin-top:10px;background:var(--mint);border:1.5px solid var(--mint-d);border-radius:14px;padding:10px 14px;text-decoration:none;color:var(--ink)}
+.slink[hidden]{display:none}
+.slink:hover{background:#DCEFED}
+.slink .ic{flex:none;width:36px;height:36px;border-radius:50%;background:var(--teal);display:grid;place-items:center}
+.slink .tx{flex:1;min-width:0;line-height:1.4}
+.slink .tx small{display:block;font-size:12px;color:var(--teal-d)}
+.slink .tx b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slink .ar{flex:none;color:var(--teal-d);font-size:20px;line-height:1}
+.ct thead a.dl{display:inline-block;margin-top:5px;font-size:12px;font-weight:400;color:var(--teal-d);background:var(--mint);border-radius:999px;padding:3px 10px;text-decoration:none;white-space:nowrap}
+.ct thead a.dl:hover{background:#DCEFED}
 summary{cursor:pointer;font-weight:700;padding:12px 0;min-height:44px;white-space:nowrap;font-size:clamp(10px,calc((100cqw - 30px) / 18),16px)}
 details .rows{margin-top:0;padding-bottom:6px}
 .notes{margin:14px 0 0;padding:0;list-style:none;font-size:12px;color:var(--muted)}
@@ -483,6 +493,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       <label class="lab" for="school"><i>1</i>学校を選ぶ</label>
       <input type="search" id="filter" placeholder="学校名で絞り込む（例: CIA）" aria-label="学校名で絞り込む" autocomplete="off">
       <select id="school"></select>
+      <a class="slink" id="schoolLink" href="#" target="_blank" rel="noopener" hidden><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.500 6-3v-4.500"/></svg></span><span class="tx"><small>口コミ・設備・コースを詳しく見る</small><b id="schoolLinkName"></b></span><span class="ar" aria-hidden="true">›</span></a>
     </div>
     <div class="step" id="s2" hidden>
       <label class="lab" for="weeks"><i>2</i>期間（週数）</label>
@@ -677,6 +688,14 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     var qt = C.quote(ENV, s, rate.value, today);
     return qt.ok ? { st: "ok", qt: qt } : { st: "invalid" };
   }
+  var SCHOOL_PAGE = {CIA:"cia",AJ:"aj-eco",BCEBU:"bcebu",COCO:"boracay-coco-english",BRILLIANT:"brilliant-cebu",BRILLIANT_FAM:"brilliant-cebu",CBEA:"cbea",CBOA:"cboa",PINES:"pines",CELLA_PREMIUM:"cella-premium",CELLA_UNI:"cella-uni",CG_SPARTA:"cg-sparta",CG_BANILAD:"cg-banilad",CIEC:"ciec",CIP:"cip",CLC:"clc",CPI:"cpi",CWA:"curious-world",EROOM:"eroom",EG:"eg-academy",APIBECI_EOP:"beci-coffee",APIBECI_SPARTA:"beci-sparta",APIBECI_CITY:"beci-city",EF1:"english-fella1",EF2:"english-fella2",EVLM:"ev-academy-lamer",EVLM_FAMILY:"ev-academy-lamer",EV:"ev-academy",FEGC:"first-english",GLC:"glc",IBREEZE_MAIN:"ibreeze",IBREEZE_PRIME:"ibreeze-prime",IMS:"ims",WE_DORM:"we-academy",WE_NR:"we-academy",JIC_CHALLENGER:"jic-main",JIC_PREMIUM:"jic-premium",MERISE:"merise",MK:"mk-education",MONOL_MAIN:"monol",MONOL_SPARTA:"monol",PHILINTER:"philinter",PILA:"pila",PILA_FAM_NP:"pila",PILA_FAM_PK:"pila",SMEAG_CAPITAL:"smeag-capital",SMEAG_ENCANTO:"smeag-encant",SMEAG_ENCANTO_FAM:"smeag-encant",SMEAG_ENCANTO_HAPPY:"smeag-encant",STARGATE:"stargate",TALK:"talk-academy",TARGET:"target",WALES:"wales",WE_ILOILO:"we-academy-iloilo",WINNING:"winning-english-city"};
+  function pageUrl(k) { return SCHOOL_PAGE[k] ? "https://cebu-buddy.com/school/" + SCHOOL_PAGE[k] + "/" : ""; }
+  function detailLink(s) { var u = pageUrl(s.key); return u ? '<a class="dl" href="' + u + '" target="_blank" rel="noopener">学校詳細 ›</a>' : ""; }
+  function renderSchoolLink() {
+    var a = $id("schoolLink"), u = sel.key ? pageUrl(sel.key) : "";
+    a.hidden = !u;
+    if (u) { a.href = u; $id("schoolLinkName").textContent = label(sel) + "の学校詳細ページ"; }
+  }
   function label(s) { var c = choices.find(function (x) { return x.key === s.key; }); return c ? c.label : ""; }
   function condText(s) {
     if (!s.key || !s.weeks) return "";
@@ -715,7 +734,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     }
     var A = resolve(sel), B = resolve(sel2);
     var dtd = function (n) { return '<td class="n d">' + (n > 0 ? "+" + yen(n) : n < 0 ? yen(n) : "−") + "</td>"; };
-    var head = "<thead><tr><th class=\"i\"></th><th>" + esc(label(sel)) + "<small>" + esc(condText(sel)) + "</small></th><th>" + (sel2.key ? esc(label(sel2)) + "<small>" + esc(condText(sel2)) + "</small>" : "比べる学校") + "</th><th>差額<small>右 − 左</small></th></tr></thead>";
+    var head = "<thead><tr><th class=\"i\"></th><th>" + esc(label(sel)) + "<small>" + esc(condText(sel)) + "</small>" + detailLink(sel) + "</th><th>" + (sel2.key ? esc(label(sel2)) + "<small>" + esc(condText(sel2)) + "</small>" + detailLink(sel2) : "比べる学校") + "</th><th>差額<small>右 − 左</small></th></tr></thead>";
     var rows = "";
     if (A.st === "ok" && B.st === "ok") {
       var ma = lineMap(A.qt), mb = lineMap(B.qt), extra = [];
@@ -739,7 +758,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
 
   function update() {
     var ok = normalize(sel);
-    renderSteps(); render(); renderCmp();
+    renderSteps(); renderSchoolLink(); render(); renderCmp();
     $id("ph").hidden = !$id("result").hidden;
     if (ok) { var s = storage(); if (s) C.saveLast(s, sel); }
     postHeight();
