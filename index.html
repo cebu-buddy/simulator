@@ -714,7 +714,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     a.hidden = !u;
     if (u) { a.href = u; $id("schoolLinkName").textContent = label(sel) + "の学校詳細ページ"; }
   }
-  function renderTitle() { var n = sel.key ? label(sel) : ""; $id("ttl").textContent = n ? n + "の費用シミュレーター" : "留学費用シミュレーター"; }
+  function renderTitle() { var n = LOCK && q0.get("t") ? q0.get("t").slice(0, 60) : sel.key ? label(sel) : ""; $id("ttl").textContent = n ? n + "の費用シミュレーター" : "留学費用シミュレーター"; }
   function label(s) { var c = choices.find(function (x) { return x.key === s.key; }); return c ? c.label : ""; }
   function condText(s) {
     if (!s.key || !s.weeks) return "";
