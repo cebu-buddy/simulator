@@ -571,7 +571,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     var f = $id("filter").value.trim().toLowerCase();
     var list = choices.filter(function (c) { return !f || c.label.toLowerCase().indexOf(f) >= 0 || c.key.toLowerCase().indexOf(f) >= 0; });
     var el = $id("school");
-    el.innerHTML = '<option value="">' + (list.length ? "学校を選んでください" : "見つかりません") + "</option>" + list.map(function (c) { return '<option value="' + esc(c.key) + '">' + esc(c.label) + "</option>"; }).join("");
+    el.innerHTML = '<option value="">' + (list.length ? "学校選択" : "見つかりません") + "</option>" + list.map(function (c) { return '<option value="' + esc(c.key) + '">' + esc(c.label) + "</option>"; }).join("");
     if (sel.key && list.some(function (c) { return c.key === sel.key; })) el.value = sel.key;
   }
   function reveal(id) { var e = $id(id); if (e.hidden) { e.hidden = false; e.classList.add("in"); } }
@@ -703,7 +703,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     if (!cmpOpen) return;
     normalize(sel2);
     var el = $id("school2");
-    if (!el.options.length) el.innerHTML = '<option value="">学校を選んでください</option>' + choices.map(function (c) { return '<option value="' + esc(c.key) + '">' + esc(c.label) + "</option>"; }).join("");
+    if (!el.options.length) el.innerHTML = '<option value="">学校選択</option>' + choices.map(function (c) { return '<option value="' + esc(c.key) + '">' + esc(c.label) + "</option>"; }).join("");
     el.value = sel2.key || "";
     var has = !!sel2.key && !!sel2.weeks;
     ["c2w", "c2c", "c2r"].forEach(function (i) { $id(i).hidden = !has; });
