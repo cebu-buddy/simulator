@@ -513,7 +513,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       <div id="c2r" hidden><label class="lab" for="room2">部屋タイプ</label><select id="room2"></select></div>
     </div>
     <div id="cmpTable"></div>
-    <button type="button" class="btn ghost" id="cmpClose">比較をやめる</button>
+    <a class="btn line" id="cmpLine" target="_blank" rel="noopener">公式LINEで無料相談する</a>
   </section>
 
   <p class="foot">セブ島留学バディー ／ 料金データ: 2026-11-14 時点</p>
@@ -733,7 +733,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       rows = '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n">' + tx(A) + '</td><td class="n">' + (B.st === "none" && !sel2.key ? "学校を選んでください" : tx(B)) + '</td><td class="n d"></td></tr>';
     }
     $id("cmpTable").innerHTML = '<table class="ct"><colgroup><col style="width:18%"><col style="width:28%"><col style="width:28%"><col style="width:26%"></colgroup>' + head + "<tbody>" + rows + "</tbody></table>" +
-      '<ul class="notes"><li>' + (WEB ? "どちらも、ウェブ限定5%OFFと端数調整を含んだ、成人1名の単身留学の目安です。割引が禁止されている学校は、5%割引の対象外です。" : "どちらも、端数調整を含んだ、成人1名の単身留学の目安です。") + "</li></ul>";
+      '<ul class="notes"><li>' + (WEB ? "どちらも、ウェブ限定5%OFFと端数調整を含んだ、成人1名の単身留学の目安です。割引が禁止されている学校は、5%割引の対象外です。" : "どちらも、1名の単身留学の場合の目安額です。") + "</li></ul>";
   }
 
   function update() {
@@ -767,7 +767,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   $id("course").addEventListener("change", function (e) { sel.courseId = e.target.value; update(); });
   $id("room").addEventListener("change", function (e) { sel.roomId = e.target.value; update(); });
   $id("cmpBtn").addEventListener("click", function () { cmpOpen = true; sel2 = {}; update(); });
-  $id("cmpClose").addEventListener("click", function () { cmpOpen = false; update(); });
+  $id("cmpLine").href = LINE_URL;
   $id("school2").addEventListener("change", function (e) { sel2 = e.target.value ? { key: e.target.value } : {}; update(); });
   $id("weeks2").addEventListener("change", function (e) { sel2.weeks = +e.target.value; update(); });
   $id("course2").addEventListener("change", function (e) { sel2.courseId = e.target.value; update(); });
