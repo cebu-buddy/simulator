@@ -352,11 +352,13 @@ const SimCore = (() => {
     return tables.some(t => env.fn.campusesOf(t).some(c => (c.courses || []).some(courseOk) && (c.rooms || []).length));
   }
 
+  const shortName = n => n.replace(/^([A-Za-z.]{2,6})（[A-Za-z ]+）$/, "$1");
+
   function listChoices(env, today) {
     return Object.keys(env.SCHOOLS).filter(k => isEligible(env, k, today)).map(k => {
       const s = env.SCHOOLS[k];
       const cs = env.fn.campusesOf(s);
-      return { key: k, campusId: s.startCampus || (cs[0] && cs[0].id) || null, label: s.name };
+      return { key: k, campusId: s.startCampus || (cs[0] && cs[0].id) || null, label: shortName(s.name) };
     }).sort((a, b) => a.label.localeCompare(b.label, "en", { sensitivity: "base", numeric: true }));
   }
 
@@ -726,7 +728,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       if (A.qt.adjustYen || B.qt.adjustYen) rows += '<tr><td class="i">端数調整</td><td class="n neg">' + (A.qt.adjustYen ? yen(A.qt.adjustYen) : "−") + '</td><td class="n neg">' + (B.qt.adjustYen ? yen(B.qt.adjustYen) : "−") + "</td>" + dtd(B.qt.adjustYen - A.qt.adjustYen) + "</tr>";
       var td = B.qt.totalYen - A.qt.totalYen;
       var ba = A.qt.totalYen < B.qt.totalYen ? " best" : "", bb = B.qt.totalYen < A.qt.totalYen ? " best" : "";
-      rows += '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n' + ba + '">' + yen(A.qt.totalYen) + (ba ? "<small>★ 安い</small>" : "") + '</td><td class="n' + bb + '">' + yen(B.qt.totalYen) + (bb ? "<small>★ 安い</small>" : "") + "</td><td class=\"n d\">" + (td === 0 ? "同額" : yen(Math.abs(td)) + "<small>" + (td < 0 ? "右が安い" : "左が安い") + "</small>") + "</td></tr>";
+      rows += '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n' + ba + '">' + yen(A.qt.totalYen) + (ba ? "<small>★ 安い</small>" : "") + '</td><td class="n' + bb + '">' + yen(B.qt.totalYen) + (bb ? "<small>★ 安い</small>" : "") + "</td><td class=\"n d\">" + (td === 0 ? "同額" : (td > 0 ? "+" : "") + yen(td)) + "</td></tr>";
       rows += '<tr><td class="i">現地でのお支払い</td><td class="n">' + localCell(A.qt) + '</td><td class="n">' + localCell(B.qt) + "</td>" + (function () { var ok = function (q) { return !(q.localInYen || q.localIncluded || q.localPending || q.localUnknown); }; if (!ok(A.qt) || !ok(B.qt)) return '<td class="n d">−</td>'; var dp = Math.round(B.qt.localPhp - A.qt.localPhp), dy = B.qt.localYen - A.qt.localYen; return dp === 0 ? '<td class="n d">−</td>' : '<td class="n d">' + (dp > 0 ? "+" : "−") + "₱" + Math.abs(dp).toLocaleString("en-US") + "<small>≒ " + (dy > 0 ? "+" : "−") + yen(Math.abs(dy)).replace("−", "") + "</small></td>"; })() + "</tr>";
     } else {
       var tx = function (r) { return r.st === "ok" ? yen(r.qt.totalYen) : STATE_TXT[r.st]; };
