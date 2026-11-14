@@ -73,13 +73,17 @@ details .rows{margin-top:0;padding-bottom:6px}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){.step.in{animation:none}.toast{transition:none}}
 .ph{display:none}
-@media (min-width:860px){
+@media (min-width:600px){
   .wrap{max-width:1040px}
-  .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+  .total .num{font-size:32px}
+  .chip{padding:6px 8px;font-size:13px}
+  .rows li{font-size:14px}
   .result{margin-top:0}
   .ph:not([hidden]){display:grid;place-items:center;min-height:220px;color:var(--muted);text-align:center;background:var(--mint);border-style:dashed}
 }
-@media (min-width:520px){.wrap{padding-top:28px}.hero h1{font-size:23px}.total .num{font-size:46px}}
+@media (min-width:520px){.wrap{padding-top:28px}.hero h1{font-size:23px}}
+@media (min-width:900px){.total .num{font-size:42px}.chip{padding:6px 14px;font-size:14px}.rows li{font-size:15px}}
 </style>
 </head>
 <body>
