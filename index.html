@@ -57,7 +57,7 @@ input[type=search]{margin-bottom:8px;min-height:44px;font-size:15px}
 .guar[hidden]{display:none}
 .guar .gm{display:flex;align-items:center;gap:12px;font-size:14px;line-height:1.7}
 .guar .gi{flex:none;width:46px;height:46px;border-radius:50%;background:var(--pink);display:grid;place-items:center}
-.guar b{color:var(--pink)}
+.guar b{color:var(--pink);font-size:clamp(13px,4.5vw,17px);line-height:1.5}
 .guar .w5s{display:block;margin-top:6px;font-size:12px;line-height:1.6;color:var(--muted)}
 details{container-type:inline-size;margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:0 12px}
 .slink{display:flex;align-items:center;gap:12px;margin-top:10px;background:var(--mint);border:1.5px solid var(--mint-d);border-radius:14px;padding:10px 14px;text-decoration:none;color:var(--ink)}
@@ -491,7 +491,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   <header class="hero">
     <div class="sun" aria-hidden="true"></div>
     <div>
-      <h1>留学費用シミュレーター</h1>
+      <h1 id="ttl">留学費用シミュレーター</h1>
       <p>選ぶだけで、費用の目安がすぐ分かります。</p>
     </div>
   </header>
@@ -714,6 +714,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     a.hidden = !u;
     if (u) { a.href = u; $id("schoolLinkName").textContent = label(sel) + "の学校詳細ページ"; }
   }
+  function renderTitle() { var n = sel.key ? label(sel) : ""; $id("ttl").textContent = n ? n + "の費用シミュレーター" : "留学費用シミュレーター"; }
   function label(s) { var c = choices.find(function (x) { return x.key === s.key; }); return c ? c.label : ""; }
   function condText(s) {
     if (!s.key || !s.weeks) return "";
@@ -776,7 +777,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
 
   function update() {
     var ok = normalize(sel);
-    renderSteps(); renderSchoolLink(); render(); renderCmp();
+    renderSteps(); renderSchoolLink(); renderTitle(); render(); renderCmp();
     $id("ph").hidden = !$id("result").hidden;
     $id("guar").hidden = $id("result").hidden;
     placeGuar();
