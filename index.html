@@ -105,7 +105,6 @@ details .rows{margin-top:0;padding-bottom:6px}
 .ct th.i,.ct td.i{text-align:left;font-weight:500}
 .ct td.d{color:var(--muted)}
 .ct td.n{white-space:nowrap}
-@media (max-width:520px){.ct{font-size:12px}.ct th,.ct td{padding:8px 3px}.ct tr.tot td{font-size:12px;padding:12px 2px}.ct tr.tot td:first-child{font-size:12px}}
 .ct td.n{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
 .ct td.neg{color:var(--pink)}
 .ct tr.tot td{font-size:19px;font-weight:700;border-bottom:0;padding:14px 8px;background:#37988F;color:#fff;vertical-align:middle}
@@ -115,6 +114,10 @@ details .rows{margin-top:0;padding-bottom:6px}
 
 .ct td small{display:block;font-weight:400;color:var(--muted)}
 .cmp .btn{margin-top:14px;width:100%}
+.ct col.c1{width:18%}.ct col.c2,.ct col.c3{width:28%}.ct col.c4{width:26%}
+@media (max-width:520px){.ct col.c1{width:22%}.ct col.c2,.ct col.c3{width:28%}.ct col.c4{width:22%}.ct{font-size:12px}.ct th,.ct td{padding:8px 3px}.ct thead th{font-size:12px}.ct tr.tot td{font-size:12px;padding:12px 3px}.ct tr.tot td:first-child{font-size:12px}.ct tr.tot td small{font-size:11px}}
+@media (max-width:380px){.ct tr.tot td{font-size:11px}.ct td.n{font-size:11px}}
+@media (max-width:340px){.ct tr.tot td,.ct td.n{font-size:10px}.ct th,.ct td{padding:8px 2px}.ct thead th{font-size:11px;overflow-wrap:anywhere}.ct thead small{font-size:10px;overflow-wrap:anywhere}.ct thead a.dl{padding:3px 6px;font-size:11px}}
 @media (prefers-reduced-motion:reduce){.step.in{animation:none}.toast{transition:none}}
 .ph{display:none}
 @media (min-width:600px){
@@ -757,7 +760,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       var tx = function (r) { return r.st === "ok" ? yen(r.qt.totalYen) : STATE_TXT[r.st]; };
       rows = '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n">' + tx(A) + '</td><td class="n">' + (B.st === "none" && !sel2.key ? "学校を選んでください" : tx(B)) + '</td><td class="n d"></td></tr>';
     }
-    $id("cmpTable").innerHTML = '<table class="ct"><colgroup><col style="width:18%"><col style="width:28%"><col style="width:28%"><col style="width:26%"></colgroup>' + head + "<tbody>" + rows + "</tbody></table>" +
+    $id("cmpTable").innerHTML = '<table class="ct"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>' + head + "<tbody>" + rows + "</tbody></table>" +
       '<ul class="notes"><li>' + (WEB ? "どちらも、ウェブ限定5%OFFと端数調整を含んだ、成人1名の単身留学の目安です。割引が禁止されている学校は、5%割引の対象外です。" : "どちらも、1名の単身留学の場合の目安額です。") + "</li></ul>";
   }
 
