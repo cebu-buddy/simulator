@@ -79,6 +79,7 @@ details .rows{margin-top:0;padding-bottom:6px}
 .actions{display:grid;gap:10px;margin-top:16px}
 .btn{display:block;text-align:center;text-decoration:none;font:inherit;font-weight:700;border:0;border-radius:999px;padding:14px 16px;min-height:50px;cursor:pointer}
 .btn.line{background:#06C755;color:#fff;box-shadow:0 6px 14px rgba(6,199,85,.3)}
+.btn.line .ar{vertical-align:-4px;margin-left:6px}
 .btn.line:active{transform:translateY(1px)}
 .btn.ghost{background:#fff;color:var(--teal-d);border:2px solid var(--mint-d)}
 .msg{margin-top:16px;padding:16px;border-radius:16px;background:var(--mint);font-size:15px}
@@ -637,7 +638,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   }
 
   // ---- 結果 ----
-  function lineBtn(label) { return '<a class="btn line" href="' + LINE_URL + '" target="_blank" rel="noopener">' + label + "</a>"; }
+  function lineBtn(label) { return '<a class="btn line" href="' + LINE_URL + '" target="_blank" rel="noopener">' + label + "<svg class=\"ar\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M13 6l6 6-6 6\"/></svg></a>"; }
   function render() {
     $id("lcol").appendChild($id("guar"));
     var el = $id("result"), msg = $id("rateMsg");
@@ -675,9 +676,9 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       '<ul class="notes">' +
       (WEB ? "<li>学校の規定で割引が禁止されている学校は、5%割引の対象外となります。</li>" : "") +
       "<li>料金は目安です。為替の変動や、学校の料金改定で、変わる場合があります。</li>" +
-      "<li>繁忙期（ピークシーズン）の追加料金・キャンペーンは含まれていません。</li>" +
+      "<li>キャンペーン・ピークシーズンの追加料金は含まれていません。</li>" +
       "</ul>" +
-      '<div class="actions">' + lineBtn("公式LINEで無料相談する") + '</div>';
+      '<div class="actions">' + lineBtn("LINEで無料相談") + '</div>';
     countTo(qt.totalYen);
   }
   function countTo(target) {
