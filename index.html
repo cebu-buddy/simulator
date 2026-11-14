@@ -35,7 +35,7 @@ select:focus,input:focus{outline:0;border-color:#F2B33D;box-shadow:0 0 0 4px rgb
 button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid #F2B33D;outline-offset:2px}
 input[type=search]{margin-bottom:8px;min-height:44px;font-size:15px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{font:inherit;font-size:14px;border:2px solid var(--mint-d);background:#fff;color:var(--teal-d);border-radius:999px;padding:6px 14px;min-height:40px;cursor:pointer}
+.chip{flex:1 1 auto;text-align:center;font:inherit;font-size:14px;border:2px solid var(--mint-d);background:#fff;color:var(--teal-d);border-radius:999px;padding:6px 14px;min-height:40px;cursor:pointer}
 .chip[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:#fff}
 .result{margin-top:16px}
 .result[hidden]{display:none}
@@ -451,7 +451,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
 
   <section class="result card" id="result" hidden aria-live="polite"></section>
 
-  <p class="foot">セブ島留学バディー ／ 料金データ: 2026-11-13 時点</p>
+  <p class="foot">セブ島留学バディー ／ 料金データ: 2026-11-14 時点</p>
 </main>
 <div class="toast" id="toast" role="status"></div>
 
@@ -535,7 +535,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     if (!weeks.length) { ["s2", "s3", "s4"].forEach(function (i) { $id(i).hidden = true; }); return; }
     reveal("s2");
     fill($id("weeks"), weeks.map(function (w) { return { id: w, name: w + "週間" }; }), sel.weeks);
-    var pop = [1, 2, 3, 4, 8, 12, 16, 24].filter(function (w) { return weeks.indexOf(w) >= 0; });
+    var pop = [1, 2, 4, 8, 12, 16, 24].filter(function (w) { return weeks.indexOf(w) >= 0; });
     $id("chips").innerHTML = pop.map(function (w) { return '<button type="button" class="chip" data-w="' + w + '" aria-pressed="' + (w === sel.weeks) + '">' + w + "週</button>"; }).join("");
     var courses = C.getOptions(ENV, { key: sel.key, campusId: sel.campusId, weeks: sel.weeks }, today).courses;
     reveal("s3"); fill($id("course"), courses, sel.courseId);
