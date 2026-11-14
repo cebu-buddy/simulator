@@ -670,7 +670,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       "<li>料金は目安です。為替の変動や、学校の料金改定で、変わる場合があります。</li>" +
       "<li>繁忙期（ピークシーズン）の追加料金・キャンペーンは含まれていません。</li>" +
       "</ul>" +
-      '<div class="actions">' + lineBtn("公式LINEで無料相談する") + '<button type="button" class="btn ghost" id="share">この条件のURLをコピー</button></div>';
+      '<div class="actions">' + lineBtn("公式LINEで無料相談する") + '</div>';
     countTo(qt.totalYen);
   }
   function countTo(target) {
@@ -804,11 +804,6 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     var t = e.target;
     if (t.classList && t.classList.contains("chip")) { sel.weeks = +t.getAttribute("data-w"); update(); }
     if (t.id === "retry") { rate.status = "idle"; update(); }
-    if (t.id === "share") {
-      var u = shareUrl();
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(function () { toast("URLをコピーしました"); }, function () { window.prompt("このURLをコピーしてください", u); });
-      else window.prompt("このURLをコピーしてください", u);
-    }
   });
 
   // ---- 初期状態: URL → 前回の条件 → 何も選ばない ----
