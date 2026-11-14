@@ -79,7 +79,7 @@ details .rows{margin-top:0;padding-bottom:6px}
 .actions{display:grid;gap:10px;margin-top:16px}
 .btn{display:block;text-align:center;text-decoration:none;font:inherit;font-weight:700;border:0;border-radius:999px;padding:14px 16px;min-height:50px;cursor:pointer}
 .btn.line{background:#06C755;color:#fff;box-shadow:0 6px 14px rgba(6,199,85,.3)}
-.btn.line .ar{vertical-align:-4px;margin-left:6px}
+.btn.line .ar{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff;color:#06C755;margin-left:8px;vertical-align:-6px;box-shadow:0 2px 4px rgba(0,0,0,.15)}
 .btn.line:active{transform:translateY(1px)}
 .btn.ghost{background:#fff;color:var(--teal-d);border:2px solid var(--mint-d)}
 .msg{margin-top:16px;padding:16px;border-radius:16px;background:var(--mint);font-size:15px}
@@ -536,7 +536,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       <div id="c2r" hidden><label class="lab" for="room2">部屋タイプ</label><select id="room2"></select></div>
     </div>
     <div id="cmpTable"></div>
-    <a class="btn line" id="cmpLine" target="_blank" rel="noopener">見積もりの詳細をLINEで聞く</a>
+    <a class="btn line" id="cmpLine" target="_blank" rel="noopener">見積詳細をLINEで聞く</a>
   </section>
 
   <p class="foot">セブ島留学バディー ／ 料金データ: 2026-11-14 時点</p>
@@ -638,7 +638,8 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   }
 
   // ---- 結果 ----
-  function lineBtn(label) { return '<a class="btn line" href="' + LINE_URL + '" target="_blank" rel="noopener">' + label + "<svg class=\"ar\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M13 6l6 6-6 6\"/></svg></a>"; }
+  var ARROW = '<span class="ar" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg></span>';
+  function lineBtn(label) { return '<a class="btn line" href="' + LINE_URL + '" target="_blank" rel="noopener">' + label + ARROW + "</a>"; }
   function render() {
     $id("lcol").appendChild($id("guar"));
     var el = $id("result"), msg = $id("rateMsg");
@@ -817,6 +818,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   $id("room").addEventListener("change", function (e) { sel.roomId = e.target.value; update(); });
   $id("cmpBtn").addEventListener("click", function () { cmpOpen = true; sel2 = {}; update(); });
   $id("cmpLine").href = LINE_URL;
+  $id("cmpLine").innerHTML = "見積詳細をLINEで聞く" + ARROW;
   $id("school2").addEventListener("change", function (e) { sel2 = e.target.value ? { key: e.target.value } : {}; update(); });
   $id("weeks2").addEventListener("change", function (e) { sel2.weeks = +e.target.value; update(); });
   $id("course2").addEventListener("change", function (e) { sel2.courseId = e.target.value; update(); });
