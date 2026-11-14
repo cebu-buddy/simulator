@@ -86,13 +86,18 @@ details .rows{margin-top:0;padding-bottom:6px}
 .cmpsel [hidden]{display:none}
 .ct{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
 .ct th,.ct td{padding:8px 6px;border-bottom:1px dashed var(--line);vertical-align:top;word-break:break-word}
-.ct thead th{font-size:13px;text-align:left;border-bottom:2px solid var(--mint-d)}
+.ct thead th{font-size:13px;text-align:right;border-bottom:2px solid var(--mint-d)}
+.ct thead th.i{text-align:left}
 .ct thead small{display:block;font-weight:400;color:var(--muted);font-size:11px}
-.ct th.i,.ct td.i{width:30%;text-align:left;font-weight:500}
+.ct th.i,.ct td.i{text-align:left;font-weight:500}
 .ct td.n{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
 .ct td.neg{color:var(--pink)}
-.ct tr.tot td{font-size:15px;border-bottom:0}
-.ct td.best{background:var(--mint);border-radius:8px}
+.ct tr.tot td{font-size:19px;font-weight:700;border-bottom:0;padding:14px 8px;background:#37988F;color:#fff;vertical-align:middle}
+.ct tr.tot td:first-child{border-radius:14px 0 0 14px;font-size:15px}
+.ct tr.tot td:last-child{border-radius:0 14px 14px 0}
+.ct tr.tot td small{color:inherit;font-weight:700;font-size:12px}
+.ct tr.tot td.best{background:#FFC55C;color:#3D2613}
+
 .ct td small{display:block;font-weight:400;color:var(--muted)}
 .cmp .btn{margin-top:14px;width:100%}
 @media (prefers-reduced-motion:reduce){.step.in{animation:none}.toast{transition:none}}
@@ -716,13 +721,13 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
       if (WEB) rows += '<tr><td class="i">ウェブ限定5%OFF</td><td class="n neg">' + yen(A.qt.discount5Yen) + '</td><td class="n neg">' + yen(B.qt.discount5Yen) + "</td></tr>";
       if (A.qt.adjustYen || B.qt.adjustYen) rows += '<tr><td class="i">端数調整</td><td class="n neg">' + (A.qt.adjustYen ? yen(A.qt.adjustYen) : "−") + '</td><td class="n neg">' + (B.qt.adjustYen ? yen(B.qt.adjustYen) : "−") + "</td></tr>";
       var ba = A.qt.totalYen < B.qt.totalYen ? " best" : "", bb = B.qt.totalYen < A.qt.totalYen ? " best" : "";
-      rows += '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n' + ba + '">' + yen(A.qt.totalYen) + '</td><td class="n' + bb + '">' + yen(B.qt.totalYen) + "</td></tr>";
+      rows += '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n' + ba + '">' + yen(A.qt.totalYen) + (ba ? "<small>★ 安い</small>" : "") + '</td><td class="n' + bb + '">' + yen(B.qt.totalYen) + (bb ? "<small>★ 安い</small>" : "") + "</td></tr>";
       rows += '<tr><td class="i">現地でのお支払い</td><td class="n">' + localCell(A.qt) + '</td><td class="n">' + localCell(B.qt) + "</td></tr>";
     } else {
       var tx = function (r) { return r.st === "ok" ? yen(r.qt.totalYen) : STATE_TXT[r.st]; };
       rows = '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n">' + tx(A) + '</td><td class="n">' + (B.st === "none" && !sel2.key ? "学校を選んでください" : tx(B)) + "</td></tr>";
     }
-    $id("cmpTable").innerHTML = '<table class="ct">' + head + "<tbody>" + rows + "</tbody></table>" +
+    $id("cmpTable").innerHTML = '<table class="ct"><colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>' + head + "<tbody>" + rows + "</tbody></table>" +
       '<ul class="notes"><li>' + (WEB ? "どちらも、ウェブ限定5%OFFと端数調整を含んだ、成人1名の単身留学の目安です。割引が禁止されている学校は、5%割引の対象外です。" : "どちらも、端数調整を含んだ、成人1名の単身留学の目安です。") + "</li></ul>";
   }
 
