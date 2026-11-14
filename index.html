@@ -71,6 +71,26 @@ details .rows{margin-top:0;padding-bottom:6px}
 .toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s}
 .toast.show{opacity:.94}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.cmpbar{margin-top:16px}
+.cmpbar .btn{width:100%}
+.cmp{margin-top:16px}
+.cmp[hidden]{display:none}
+.cmph{font-size:17px;margin:0 0 12px}
+.cmpsel{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+.cmpsel .lab{font-size:14px}
+.cmpsel [hidden]{display:none}
+.ct{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.ct th,.ct td{padding:8px 6px;border-bottom:1px dashed var(--line);vertical-align:top;word-break:break-word}
+.ct thead th{font-size:13px;text-align:left;border-bottom:2px solid var(--mint-d)}
+.ct thead small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+.ct th.i,.ct td.i{width:30%;text-align:left;font-weight:500}
+.ct td.n{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.ct td.neg{color:var(--pink)}
+.ct tr.tot td{font-size:15px;border-bottom:0}
+.ct td.best{background:var(--mint);border-radius:8px}
+.ct td small{display:block;font-weight:400;color:var(--muted)}
+.cmp .btn{margin-top:14px;width:100%}
 @media (prefers-reduced-motion:reduce){.step.in{animation:none}.toast{transition:none}}
 .ph{display:none}
 @media (min-width:600px){
@@ -470,6 +490,19 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   <div class="ph card" id="ph"><p>学校を選ぶと、ここに費用の目安が出ます。</p></div>
   </div>
 
+  <div class="cmpbar"><button type="button" class="btn ghost" id="cmpBtn" hidden>別の学校と比べる</button></div>
+  <section class="card cmp" id="cmp" hidden aria-label="学校の比較">
+    <h2 class="cmph">別の学校と比べる</h2>
+    <div class="cmpsel">
+      <div><label class="lab" for="school2">比べる学校</label><select id="school2"></select></div>
+      <div id="c2w" hidden><label class="lab" for="weeks2">期間（週数）</label><select id="weeks2"></select></div>
+      <div id="c2c" hidden><label class="lab" for="course2">コース</label><select id="course2"></select></div>
+      <div id="c2r" hidden><label class="lab" for="room2">部屋タイプ</label><select id="room2"></select></div>
+    </div>
+    <div id="cmpTable"></div>
+    <button type="button" class="btn ghost" id="cmpClose">比較をやめる</button>
+  </section>
+
   <p class="foot">セブ島留学バディー ／ 料金データ: 2026-11-14 時点</p>
 </main>
 <div class="toast" id="toast" role="status"></div>
@@ -491,6 +524,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   var choices = C.listChoices(ENV, today);
   var sel = {};            // {key, campusId, weeks, courseId, roomId}
   var rate = { status: "idle", value: null, info: "" };
+  var sel2 = {}, cmpOpen = false;   // 比べる学校
   var shown = 0;           // 表示中の合計金額（数字の切り替え用）
 
   function storage() { try { return window.localStorage; } catch (e) { return null; } }
@@ -533,7 +567,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     return list[0];
   }
 
-  function normalize() {   // 選択を、選べる組み合わせにそろえる
+  function normalize(sel) {   // 選択を、選べる組み合わせにそろえる
     var c = choices.find(function (x) { return x.key === sel.key; });
     if (!c) return false;
     sel.campusId = c.campusId;
@@ -614,9 +648,82 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     (function step(t) { var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = yen(from + (target - from) * e); if (p < 1) requestAnimationFrame(step); })(t0);
   }
 
+
+  // ---- 学校の比較 ----
+  function resolve(s) {   // 比較用: 状態と見積
+    if (!s.key) return { st: "none" };
+    if (C.getOptions(ENV, { key: s.key, campusId: s.campusId }, today).noTable) return { st: "noTable" };
+    if (!s.weeks || !s.courseId || !s.roomId) return { st: "none" };
+    if (C.needsRate(ENV, s.key, today) === "auto") {
+      if (rate.status === "idle") { fetchLowRate(); return { st: "loading" }; }
+      if (rate.status === "loading") return { st: "loading" };
+      if (rate.status === "fail") return { st: "fail" };
+    }
+    var qt = C.quote(ENV, s, rate.value, today);
+    return qt.ok ? { st: "ok", qt: qt } : { st: "invalid" };
+  }
+  function label(s) { var c = choices.find(function (x) { return x.key === s.key; }); return c ? c.label : ""; }
+  function condText(s) {
+    if (!s.key || !s.weeks) return "";
+    var b = { key: s.key, campusId: s.campusId, weeks: s.weeks };
+    var co = C.getOptions(ENV, b, today).courses.find(function (x) { return x.id === s.courseId; });
+    var ro = C.getRooms(ENV, { key: s.key, campusId: s.campusId, weeks: s.weeks, courseId: s.courseId }, today).find(function (x) { return x.id === s.roomId; });
+    return s.weeks + "週間 ／ " + (co ? co.name : "") + " ／ " + (ro ? ro.name : "");
+  }
+  var STATE_TXT = { none: "−", noTable: "LINEで確認", loading: "確認中…", fail: "取得できません", invalid: "−" };
+  function lineMap(qt) {
+    var m = {};
+    qt.lines.forEach(function (l) { var k = (l.id === "enroll" || l.id === "tuition" || l.id === "longdisc" || l.id === "round") ? l.id : "x:" + l.label; m[k] = { label: l.label, yen: l.yen }; });
+    return m;
+  }
+  function localCell(qt) {
+    if (qt.localInYen) return "上の金額に含む";
+    if (qt.localIncluded) return "料金に含む";
+    if (qt.localPending || qt.localUnknown) return "LINEでご案内";
+    return "₱" + Math.round(qt.localPhp).toLocaleString("en-US") + "<small>≒ " + yen(qt.localYen) + "</small>";
+  }
+  function renderCmp() {
+    $id("cmpBtn").hidden = !sel.key || cmpOpen;
+    $id("cmp").hidden = !cmpOpen;
+    if (!cmpOpen) return;
+    normalize(sel2);
+    var el = $id("school2");
+    if (!el.options.length) el.innerHTML = '<option value="">学校を選んでください</option>' + choices.map(function (c) { return '<option value="' + esc(c.key) + '">' + esc(c.label) + "</option>"; }).join("");
+    el.value = sel2.key || "";
+    var has = !!sel2.key && !!sel2.weeks;
+    ["c2w", "c2c", "c2r"].forEach(function (i) { $id(i).hidden = !has; });
+    if (has) {
+      var base = { key: sel2.key, campusId: sel2.campusId };
+      fill($id("weeks2"), C.getWeeks(ENV, base, today).map(function (w) { return { id: w, name: w + "週間" }; }), sel2.weeks);
+      fill($id("course2"), C.getOptions(ENV, { key: sel2.key, campusId: sel2.campusId, weeks: sel2.weeks }, today).courses, sel2.courseId);
+      fill($id("room2"), C.getRooms(ENV, { key: sel2.key, campusId: sel2.campusId, weeks: sel2.weeks, courseId: sel2.courseId }, today), sel2.roomId);
+    }
+    var A = resolve(sel), B = resolve(sel2);
+    var head = "<thead><tr><th class=\"i\"></th><th>" + esc(label(sel)) + "<small>" + esc(condText(sel)) + "</small></th><th>" + (sel2.key ? esc(label(sel2)) + "<small>" + esc(condText(sel2)) + "</small>" : "比べる学校") + "</th></tr></thead>";
+    var rows = "";
+    if (A.st === "ok" && B.st === "ok") {
+      var ma = lineMap(A.qt), mb = lineMap(B.qt), extra = [];
+      [ma, mb].forEach(function (m) { Object.keys(m).forEach(function (k) { if (k.indexOf("x:") === 0 && extra.indexOf(k) < 0) extra.push(k); }); });
+      var keys = ["enroll", "tuition"].concat(extra, ["longdisc"]);
+      var nm = { enroll: "入学金", tuition: "授業料および寮費", longdisc: "長期割引" };
+      var cell = function (m, k) { return m[k] ? yen(m[k].yen) : "−"; };
+      keys.forEach(function (k) { var lb = nm[k] || (ma[k] || mb[k]).label; rows += '<tr><td class="i">' + esc(lb) + '</td><td class="n' + (ma[k] && ma[k].yen < 0 ? " neg" : "") + '">' + cell(ma, k) + '</td><td class="n' + (mb[k] && mb[k].yen < 0 ? " neg" : "") + '">' + cell(mb, k) + "</td></tr>"; });
+      rows += '<tr><td class="i">ウェブ限定5%OFF</td><td class="n neg">' + yen(A.qt.discount5Yen) + '</td><td class="n neg">' + yen(B.qt.discount5Yen) + "</td></tr>";
+      if (A.qt.adjustYen || B.qt.adjustYen) rows += '<tr><td class="i">端数調整</td><td class="n neg">' + yen(A.qt.adjustYen) + '</td><td class="n neg">' + yen(B.qt.adjustYen) + "</td></tr>";
+      var ba = A.qt.totalYen < B.qt.totalYen ? " best" : "", bb = B.qt.totalYen < A.qt.totalYen ? " best" : "";
+      rows += '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n' + ba + '">' + yen(A.qt.totalYen) + '</td><td class="n' + bb + '">' + yen(B.qt.totalYen) + "</td></tr>";
+      rows += '<tr><td class="i">現地でのお支払い</td><td class="n">' + localCell(A.qt) + '</td><td class="n">' + localCell(B.qt) + "</td></tr>";
+    } else {
+      var tx = function (r) { return r.st === "ok" ? yen(r.qt.totalYen) : STATE_TXT[r.st]; };
+      rows = '<tr class="tot"><td class="i">費用の目安（約）</td><td class="n">' + tx(A) + '</td><td class="n">' + (B.st === "none" && !sel2.key ? "学校を選んでください" : tx(B)) + "</td></tr>";
+    }
+    $id("cmpTable").innerHTML = '<table class="ct">' + head + "<tbody>" + rows + "</tbody></table>" +
+      '<ul class="notes"><li>どちらも、ウェブ限定5%OFFと端数調整を含んだ、成人1名の単身留学の目安です。割引が禁止されている学校は、5%割引の対象外です。</li></ul>';
+  }
+
   function update() {
-    var ok = normalize();
-    renderSteps(); render();
+    var ok = normalize(sel);
+    renderSteps(); render(); renderCmp();
     $id("ph").hidden = !$id("result").hidden;
     if (ok) { var s = storage(); if (s) C.saveLast(s, sel); }
     postHeight();
@@ -644,6 +751,12 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   $id("weeks").addEventListener("change", function (e) { sel.weeks = +e.target.value; update(); });
   $id("course").addEventListener("change", function (e) { sel.courseId = e.target.value; update(); });
   $id("room").addEventListener("change", function (e) { sel.roomId = e.target.value; update(); });
+  $id("cmpBtn").addEventListener("click", function () { cmpOpen = true; sel2 = {}; update(); });
+  $id("cmpClose").addEventListener("click", function () { cmpOpen = false; update(); });
+  $id("school2").addEventListener("change", function (e) { sel2 = e.target.value ? { key: e.target.value } : {}; update(); });
+  $id("weeks2").addEventListener("change", function (e) { sel2.weeks = +e.target.value; update(); });
+  $id("course2").addEventListener("change", function (e) { sel2.courseId = e.target.value; update(); });
+  $id("room2").addEventListener("change", function (e) { sel2.roomId = e.target.value; update(); });
   document.addEventListener("click", function (e) {
     var t = e.target;
     if (t.classList && t.classList.contains("chip")) { sel.weeks = +t.getAttribute("data-w"); update(); }
