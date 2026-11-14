@@ -739,7 +739,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     }
     var A = resolve(sel), B = resolve(sel2);
     var dtd = function (n) { return '<td class="n d">' + (n > 0 ? "+" + yen(n) : n < 0 ? yen(n) : "−") + "</td>"; };
-    var head = "<thead><tr><th class=\"i\"></th><th>" + esc(label(sel)) + "<small>" + esc(condText(sel)) + "</small>" + detailLink(sel) + "</th><th>" + (sel2.key ? esc(label(sel2)) + "<small>" + esc(condText(sel2)) + "</small>" + detailLink(sel2) : "比べる学校") + "</th><th>差額<small>右 − 左</small></th></tr></thead>";
+    var head = "<thead><tr><th class=\"i\"></th><th>" + esc(label(sel)) + "<small>" + esc(condText(sel)) + "</small>" + detailLink(sel) + "</th><th>" + (sel2.key ? esc(label(sel2)) + "<small>" + esc(condText(sel2)) + "</small>" + detailLink(sel2) : "比べる学校") + "</th><th>差額</th></tr></thead>";
     var rows = "";
     if (A.st === "ok" && B.st === "ok") {
       var ma = lineMap(A.qt), mb = lineMap(B.qt), extra = [];
