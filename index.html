@@ -83,6 +83,7 @@ details .rows{margin-top:0;padding-bottom:6px}
 .cmph{font-size:17px;margin:0 0 12px}
 .cmpsel{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
 .cmpsel .lab{font-size:14px}
+@media (min-width:600px){.cmpsel{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.cmpsel select{padding:12px 30px 12px 10px;font-size:15px;text-overflow:ellipsis}}
 .cmpsel [hidden]{display:none}
 .ct{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
 .ct th,.ct td{padding:8px 6px;border-bottom:1px dashed var(--line);vertical-align:top;word-break:break-word}
