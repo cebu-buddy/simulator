@@ -461,7 +461,7 @@ const SimCore = (() => {
   function loadLast(storage) { try { const j = JSON.parse(storage.getItem(LAST_KEY)); return j && typeof j === "object" ? j : null; } catch (e) { return null; } }
   function saveLast(storage, sel) { try { storage.setItem(LAST_KEY, JSON.stringify(sel)); } catch (e) {   } }
 
-  return { DISCOUNT_RATE, PHP_YEN, EXCLUDE_KEYS, MINOR_RE, NOT_SOLO_RE, listChoices, isEligible, getOptions, getRooms, getWeeks, needsRate, fixedRateOf, quote, parseParams, loadLast, saveLast, LAST_KEY };
+  return { DISCOUNT_RATE, PHP_YEN, EXCLUDE_KEYS, shortName, MINOR_RE, NOT_SOLO_RE, listChoices, isEligible, getOptions, getRooms, getWeeks, needsRate, fixedRateOf, quote, parseParams, loadLast, saveLast, LAST_KEY };
 })();
 if (typeof module !== "undefined") module.exports = SimCore;
 
@@ -645,7 +645,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     el.innerHTML =
       '<div class="total"><small>費用の目安</small><div class="num"><span class="ap">約</span><span id="totalNum">' + yen(shown) + '</span></div>' + (WEB ? '<span class="off">' + yen(saved) + " おトク</span>" : "") + "</div>" +
       rateTxt + '<ul class="rows">' + rows + "</ul>" +
-      '<div class="web5">' + (WEB ? "<b>ウェブ限定5%OFF</b>は、上の金額にすでに反映されています。" : "<b>最安値保証</b>をしているので、お安く留学が可能です。") + "</div>" + local +
+      '<div class="web5">' + (WEB ? "<b>ウェブ限定5%OFF</b>は、上の金額にすでに反映されています。" : "<b>バディーは最安値保証！</b>どこよりもお安く金額提示します！") + "</div>" + local +
       '<ul class="notes">' +
       (WEB ? "<li>学校の規定で割引が禁止されている学校は、5%割引の対象外となります。</li>" : "") +
       "<li>料金は目安です。為替の変動や、学校の料金改定で、変わる場合があります。お申し込み前に、最新の金額をご案内します。</li>" +
