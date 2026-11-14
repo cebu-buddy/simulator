@@ -7,12 +7,12 @@
 <meta name="description" content="学校・期間・コース・部屋タイプを選ぶだけで、セブ島留学の費用の目安がすぐ分かります。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
 <style>
 :root{
   --teal:#49B0A8; --teal-d:#3A938C; --mint:#E7F4F3; --mint-d:#86C7C2; --pink:#E76874; --ink:#3D2613;
   --cream:#FFFCF6; --card:#fff; --line:#E9E2D6; --muted:#7a6a5a;
-  --font:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  --font:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -34,8 +34,8 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--teal-d) 50%)
 select:focus,input:focus{outline:0;border-color:#F2B33D;box-shadow:0 0 0 4px rgba(255,197,92,.4)}
 button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid #F2B33D;outline-offset:2px}
 input[type=search]{margin-bottom:8px;min-height:44px;font-size:15px}
-.chips{display:flex;flex-wrap:nowrap;gap:6px;margin-top:8px}
-.chip{flex:1 1 0;min-width:0;white-space:nowrap;text-align:center;font:inherit;font-size:14px;border:2px solid var(--mint-d);background:#fff;color:var(--teal-d);border-radius:999px;padding:6px 2px;min-height:40px;cursor:pointer}
+.chips{container-type:inline-size;display:flex;flex-wrap:nowrap;gap:6px;margin-top:8px}
+.chip{flex:1 1 0;min-width:0;white-space:nowrap;text-align:center;font:inherit;font-size:clamp(10px,4cqw,14px);border:2px solid var(--mint-d);background:#fff;color:var(--teal-d);border-radius:999px;padding:6px 2px;min-height:40px;cursor:pointer}
 .chip[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:#fff}
 .result{margin-top:16px}
 .result[hidden]{display:none}
@@ -66,7 +66,7 @@ details{container-type:inline-size;margin-top:12px;border:1px solid var(--line);
 .slink .ar{flex:none;color:var(--teal-d);font-size:20px;line-height:1}
 .ct thead a.dl{display:inline-block;margin-top:5px;font-size:12px;font-weight:400;color:var(--teal-d);background:var(--mint);border-radius:999px;padding:3px 10px;text-decoration:none;white-space:nowrap}
 .ct thead a.dl:hover{background:#DCEFED}
-@media (max-width:350px){.chips{gap:4px}.chip{font-size:11px;border-width:1.5px}}
+@media (max-width:350px){.chips{gap:4px}.chip{border-width:1.5px}}
 summary{cursor:pointer;font-weight:700;padding:12px 0;min-height:44px;white-space:nowrap;font-size:clamp(10px,calc((100cqw - 30px) / 18),16px)}
 details .rows{margin-top:0;padding-bottom:6px}
 .notes{margin:14px 0 0;padding:0;list-style:none;font-size:12px;color:var(--muted)}
@@ -120,13 +120,12 @@ details .rows{margin-top:0;padding-bottom:6px}
   .wrap{max-width:1040px}
   .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
   .total .num{font-size:36px}
-  .chip{font-size:13px}
   .rows li{font-size:14px}
   .result{margin-top:0}
   .ph:not([hidden]){display:grid;place-items:center;min-height:220px;color:var(--muted);text-align:center;background:var(--mint);border-style:dashed}
 }
 @media (min-width:520px){.wrap{padding-top:28px}.hero h1{font-size:23px}}
-@media (min-width:900px){.total .num{font-size:52px}.chip{font-size:14px}.rows li{font-size:15px}}
+@media (min-width:900px){.total .num{font-size:52px}.rows li{font-size:15px}}
 </style>
 </head>
 <body>
@@ -549,6 +548,10 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
 
   var choices = C.listChoices(ENV, today);
+  // 学校ページに埋め込むときの固定モード: ?lock=1&school=KEY（複数校のページは、school=KEY1,KEY2）
+  var lockKeys = [];
+  if (q0.get("lock") === "1") lockKeys = (q0.get("school") || "").split(",").filter(function (k) { return choices.some(function (c) { return c.key === k; }); });
+  var LOCK = lockKeys.length > 0;
   var sel = {};            // {key, campusId, weeks, courseId, roomId}
   var rate = { status: "idle", value: null, info: "" };
   var sel2 = {}, cmpOpen = false;   // 比べる学校
@@ -581,7 +584,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   }
   function renderSchools() {
     var f = $id("filter").value.trim().toLowerCase();
-    var list = choices.filter(function (c) { return !f || c.label.toLowerCase().indexOf(f) >= 0 || c.key.toLowerCase().indexOf(f) >= 0; });
+    var list = choices.filter(function (c) { return (!LOCK || lockKeys.indexOf(c.key) >= 0) && (!f || c.label.toLowerCase().indexOf(f) >= 0 || c.key.toLowerCase().indexOf(f) >= 0); });
     var el = $id("school");
     el.innerHTML = '<option value="">' + (list.length ? "学校選択" : "見つかりません") + "</option>" + list.map(function (c) { return '<option value="' + esc(c.key) + '">' + esc(c.label) + "</option>"; }).join("");
     if (sel.key && list.some(function (c) { return c.key === sel.key; })) el.value = sel.key;
@@ -693,7 +696,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   function pageUrl(k) { return SCHOOL_PAGE[k] ? "https://cebu-buddy.com/school/" + SCHOOL_PAGE[k] + "/" : ""; }
   function detailLink(s) { var u = pageUrl(s.key); return u ? '<a class="dl" href="' + u + '" target="_blank" rel="noopener">学校詳細 ›</a>' : ""; }
   function renderSchoolLink() {
-    var a = $id("schoolLink"), u = sel.key ? pageUrl(sel.key) : "";
+    var a = $id("schoolLink"), u = sel.key && !LOCK ? pageUrl(sel.key) : "";
     a.hidden = !u;
     if (u) { a.href = u; $id("schoolLinkName").textContent = label(sel) + "の学校詳細ページ"; }
   }
@@ -761,7 +764,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     var ok = normalize(sel);
     renderSteps(); renderSchoolLink(); render(); renderCmp();
     $id("ph").hidden = !$id("result").hidden;
-    if (ok) { var s = storage(); if (s) C.saveLast(s, sel); }
+    if (ok && !LOCK) { var s = storage(); if (s) C.saveLast(s, sel); }
     postHeight();
   }
 
@@ -805,10 +808,18 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   });
 
   // ---- 初期状態: URL → 前回の条件 → 何も選ばない ----
-  var fromUrl = C.parseParams(location.search, ENV, today), last = null;
-  var st = storage(); if (st) last = C.loadLast(st);
+  var search = LOCK ? "?" + new URLSearchParams(Object.assign({}, Object.fromEntries(q0), { school: lockKeys[0] })).toString() : location.search;
+  var fromUrl = C.parseParams(search, ENV, today), last = null;
+  var st = LOCK ? null : storage(); if (st) last = C.loadLast(st);
   if (fromUrl.key) sel = fromUrl;
   else if (last && last.key && choices.some(function (c) { return c.key === last.key; })) sel = { key: last.key, weeks: last.weeks, courseId: last.courseId, roomId: last.roomId };
+  if (LOCK) {
+    document.body.classList.add("lock");
+    if (lockKeys.length === 1) {
+      $id("s1").hidden = true;
+      ["s2", "s3", "s4"].forEach(function (id, i) { var n = document.querySelector("#" + id + " .lab i"); if (n) n.textContent = String(i + 1); });
+    } else { document.querySelector("#s1 .lab").lastChild.textContent = "学校・キャンパスを選ぶ"; $id("filter").hidden = true; }
+  }
   renderSchools();
   update();
 })();

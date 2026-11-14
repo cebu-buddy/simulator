@@ -107,3 +107,10 @@ window.addEventListener("message", function (e) {
 | `WALES` | WALES |
 | `WE_ILOILO` | WE Academy ILOILO |
 | `WINNING` | Winning English |
+
+### 2-3. 学校の詳細ページに埋め込む（学校固定モード）
+`?lock=1&school=CIA` のように `lock=1` を付けると、学校の選択欄が隠れ、期間から始まる画面になります（「別の学校と比べる」は、そのまま使えます）。
+- 複数の学校データがつながるページは、`school=WE_DORM,WE_NR` のようにカンマでつなぐ。上に、学校・キャンパスの切り替えが出ます。
+- 前回の条件は、引き継がれません（常に、そのページの学校から始まる）。
+- ページごとのコードの一覧は、社内の `261114_学校ページ用シミュレーター_設置一覧.md` を参照。
+
