@@ -495,7 +495,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   </header>
 
   <div class="layout">
-  <div class="lcol">
+  <div class="lcol" id="lcol">
   <section class="card" aria-label="条件の選択">
     <div class="step" id="s1">
       <label class="lab" for="school"><i>1</i>学校を選ぶ</label>
@@ -639,6 +639,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   // ---- 結果 ----
   function lineBtn(label) { return '<a class="btn line" href="' + LINE_URL + '" target="_blank" rel="noopener">' + label + "</a>"; }
   function render() {
+    $id("lcol").appendChild($id("guar"));
     var el = $id("result"), msg = $id("rateMsg");
     msg.textContent = "";
     if (!sel.key) { el.hidden = true; return; }
@@ -775,6 +776,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     renderSteps(); renderSchoolLink(); render(); renderCmp();
     $id("ph").hidden = !$id("result").hidden;
     $id("guar").hidden = $id("result").hidden;
+    placeGuar();
     if (ok && !LOCK) { var s = storage(); if (s) C.saveLast(s, sel); }
     postHeight();
   }
@@ -797,6 +799,14 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
 
   $id("guarTx").innerHTML = WEB ? "<b>ウェブ限定5%OFF</b>は、<br>上の金額にすでに反映されています。" : "<b>バディーは最安値保証！</b><br>どこよりもお安く金額提示します！";
   $id("guarNote").textContent = WEB ? "" : "※シミュレーション価格より下げてご提案できることも御座います";
+
+  var mqPhone = window.matchMedia("(max-width:599px)");
+  function placeGuar() {
+    var g = $id("guar"), el = $id("result"), act = el.querySelector(".actions");
+    if (mqPhone.matches && act && !el.hidden) { if (g.nextElementSibling !== act) el.insertBefore(g, act); }
+    else if (g.parentNode !== $id("lcol")) $id("lcol").appendChild(g);
+  }
+  if (mqPhone.addEventListener) mqPhone.addEventListener("change", function () { placeGuar(); });
 
   // ---- 操作 ----
   $id("filter").addEventListener("input", renderSchools);
