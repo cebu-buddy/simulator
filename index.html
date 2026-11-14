@@ -53,8 +53,12 @@ input[type=search]{margin-bottom:8px;min-height:44px;font-size:15px}
 .rows .sub{display:block;font-size:12px;color:var(--muted);font-weight:400}
 .rows .free .v{color:var(--teal-d)}
 .rate{font-size:12px;color:var(--muted);margin:8px 0 0}
-.web5{margin-top:12px;background:#FFF3F4;border:1px solid #F7CBD0;border-radius:14px;padding:10px 12px;font-size:14px}
-.web5 b{color:var(--pink)}
+.guar{margin-top:12px;background:#FFF3F4;border:1px solid #F7CBD0;border-radius:18px;padding:12px 14px}
+.guar[hidden]{display:none}
+.guar .gm{display:flex;align-items:center;gap:12px;font-size:14px;line-height:1.7}
+.guar .gi{flex:none;width:46px;height:46px;border-radius:50%;background:var(--pink);display:grid;place-items:center}
+.guar b{color:var(--pink)}
+.guar .w5s{display:block;margin-top:6px;font-size:12px;line-height:1.6;color:var(--muted)}
 details{container-type:inline-size;margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:0 12px}
 .slink{display:flex;align-items:center;gap:12px;margin-top:10px;background:var(--mint);border:1.5px solid var(--mint-d);border-radius:14px;padding:10px 14px;text-decoration:none;color:var(--ink)}
 .slink[hidden]{display:none}
@@ -67,7 +71,6 @@ details{container-type:inline-size;margin-top:12px;border:1px solid var(--line);
 .ct thead a.dl{display:inline-block;margin-top:5px;font-size:12px;font-weight:400;color:var(--teal-d);background:var(--mint);border-radius:999px;padding:3px 10px;text-decoration:none;white-space:nowrap}
 .ct thead a.dl:hover{background:#DCEFED}
 @media (max-width:350px){.chips{gap:4px}.chip{border-width:1.5px}}
-.web5 .w5s{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
 summary{cursor:pointer;font-weight:700;padding:12px 0;min-height:44px;white-space:nowrap;font-size:clamp(10px,calc((100cqw - 30px) / 18),16px)}
 details .rows{margin-top:0;padding-bottom:6px}
 .notes{margin:14px 0 0;padding:0;list-style:none;font-size:12px;color:var(--muted)}
@@ -492,6 +495,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
   </header>
 
   <div class="layout">
+  <div class="lcol">
   <section class="card" aria-label="条件の選択">
     <div class="step" id="s1">
       <label class="lab" for="school"><i>1</i>学校を選ぶ</label>
@@ -514,6 +518,8 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     </div>
     <p class="rate" id="rateMsg" role="status"></p>
   </section>
+    <div class="guar" id="guar" hidden><div class="gm"><span class="gi"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7.2A2.2 2.2 0 0 1 7.2 5h1.5a2.2 2.2 0 0 0 1.5-.6l1-1a2.2 2.2 0 0 1 3.1 0l1 1c.4.4 1 .6 1.600.6h1.400A2.200 2.200 0 0 1 19 7.200v1.400c0 .6.2 1.100.6 1.600l1 1a2.200 2.200 0 0 1 0 3.100l-1 1c-.4.4-.6 1-.6 1.600v1.400a2.200 2.200 0 0 1-2.200 2.200h-1.400c-.6 0-1.100.2-1.600.6l-1 1a2.200 2.200 0 0 1-3.100 0l-1-1a2.200 2.200 0 0 0-1.600-.6H7.200A2.200 2.200 0 0 1 5 16.800v-1.400c0-.6-.2-1.100-.6-1.600l-1-1a2.200 2.200 0 0 1 0-3.100l1-1c.4-.4.6-1 .6-1.600z"/><path d="M9 12l2 2 4-4"/></svg></span><div id="guarTx"></div></div><span class="w5s" id="guarNote"></span></div>
+  </div>
 
   <section class="result card" id="result" hidden aria-live="polite"></section>
   <div class="ph card" id="ph"><p>学校を選ぶと、ここに費用の目安が出ます。</p></div>
@@ -664,7 +670,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     el.innerHTML =
       '<div class="total"><small>費用の目安</small><div class="num"><span class="ap">約</span><span id="totalNum">' + yen(shown) + '</span></div>' + (WEB ? '<span class="off">' + yen(saved) + " おトク</span>" : "") + "</div>" +
       rateTxt + '<ul class="rows">' + rows + "</ul>" +
-      '<div class="web5">' + (WEB ? "<b>ウェブ限定5%OFF</b>は、上の金額にすでに反映されています。" : "<b>バディーは最安値保証！</b>どこよりもお安く金額提示します！<span class=\"w5s\">※シミュレーション価格より下げてご提案できることも御座います</span>") + "</div>" + local +
+      local +
       '<ul class="notes">' +
       (WEB ? "<li>学校の規定で割引が禁止されている学校は、5%割引の対象外となります。</li>" : "") +
       "<li>料金は目安です。為替の変動や、学校の料金改定で、変わる場合があります。</li>" +
@@ -768,6 +774,7 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     var ok = normalize(sel);
     renderSteps(); renderSchoolLink(); render(); renderCmp();
     $id("ph").hidden = !$id("result").hidden;
+    $id("guar").hidden = $id("result").hidden;
     if (ok && !LOCK) { var s = storage(); if (s) C.saveLast(s, sel); }
     postHeight();
   }
@@ -787,6 +794,9 @@ const SIM_ENV = { SCHOOLS, dom, fn: { calcQuote, calcLocal, effective, campusesO
     var p = new URLSearchParams({ school: sel.key, course: sel.courseId, room: sel.roomId, weeks: sel.weeks });
     return location.origin + location.pathname + "?" + p.toString();
   }
+
+  $id("guarTx").innerHTML = WEB ? "<b>ウェブ限定5%OFF</b>は、<br>上の金額にすでに反映されています。" : "<b>バディーは最安値保証！</b><br>どこよりもお安く金額提示します！";
+  $id("guarNote").textContent = WEB ? "" : "※シミュレーション価格より下げてご提案できることも御座います";
 
   // ---- 操作 ----
   $id("filter").addEventListener("input", renderSchools);
